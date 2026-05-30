@@ -13,4 +13,7 @@ public enum Piece {
     public String getLabel() {
         return label;
     }
+    public Piece togglePiece() {
+        return this == X ? O : X;
+    }
 }

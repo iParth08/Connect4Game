@@ -48,6 +48,15 @@ public class Board {
         }
         return null;
     }
+    public boolean hasAvailableCell(){
+            for(int j = 0; j < col; j++){
+                if(grid[0][j].getPiece() == Piece.EMPTY){
+                    return true;
+                }
+            }
+        return false;
+    }
+
     public boolean isConnectedFour(Position lastPositionedCell){
         Piece [] xAxis = new Piece[7];
         Piece [] yAxis = new Piece[7];
@@ -97,16 +106,6 @@ public class Board {
                 || isConsecutiveConnect(yAxis, maxOffsetBound)
                 || isConsecutiveConnect(sameSignDiagonal, maxOffsetBound)
                 || isConsecutiveConnect(diffSignDiagonal, maxOffsetBound);
-    }
-    public boolean hasAvailableCell(){
-        for(int i = 0; i < row; i++){
-            for(int j = 0; j < col; j++){
-                if(grid[i][j].getPiece() == Piece.EMPTY){
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 
     private boolean isValidCellPosition(int row, int col){

@@ -79,26 +79,13 @@ public class GameManager  {
                     gameState = GameState.DRAW;
                 }
                 if(gameState == GameState.RUNNING){
-                    switchPiece();
+                    currentPiece = currentPiece.togglePiece();
                 }
             }
         }
     }
 
 
-
-    private void switchPiece(){
-        switch (currentPiece){
-            case O:
-                currentPiece = Piece.X;
-                break;
-            case X:
-                currentPiece = Piece.O;
-                break;
-            default:
-                currentPiece = Piece.EMPTY;
-        }
-    }
 
     private void executeSpecialCommand(UserCommand command){
         switch (command){

@@ -63,7 +63,7 @@ public class ConsoleRenderer {
                 System.out.println("Game won by Mr. " + piece.getLabel());
                 break;
             case DRAW:
-                    System.out.println("lets call it a draw");
+                    System.out.println("Lets call it a draw.");
                     break;
             case EXIT:
                     System.out.println("Its sad, you decided to go, Mr. " + piece.getLabel());
