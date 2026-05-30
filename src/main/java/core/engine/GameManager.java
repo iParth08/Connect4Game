@@ -2,9 +2,11 @@ package core.engine;
 
 import core.board.Board;
 import core.board.Piece;
+import core.player.UserCommand;
 import ui.console.ConsoleInputHandler;
 import ui.console.ConsoleRenderer;
 import utils.Constants;
+import utils.MessageType;
 import utils.Position;
 
 public class GameManager  {
@@ -20,12 +22,32 @@ public class GameManager  {
     }
 
     public void startGame(){
-        initGameState();
-        consoleRenderer.printWelcomeScreen();
-        consoleRenderer.printMenu();
-        consoleRenderer.printGameBoard(board);
-        gameLoop();
-        gameStateMessage();
+        boolean keepPlaying = true;
+        while(keepPlaying){
+            initGameState();
+            consoleRenderer.clearConsole();
+            consoleRenderer.printWelcomeScreen();
+            consoleRenderer.printMenu();
+            consoleRenderer.printGameBoard(board);
+            gameLoop();
+            consoleRenderer.postGameStateMessage(gameState, currentPiece);
+            if(gameState != GameState.RESTART)
+                keepPlaying = handlePostGameChoice();
+            else
+                consoleRenderer.printMessage(MessageType.RESTART, currentPiece);
+        }
+
+    }
+
+    private boolean handlePostGameChoice(){
+        consoleRenderer.printMessage(MessageType.ASK_RESTART, currentPiece);
+        char userInput = consoleInputHandler.getUserCommand(currentPiece.getLabel());
+        if(userInput == 'Y'){
+            return true;
+        }else {
+            consoleRenderer.printMessage(MessageType.BYE, currentPiece);
+            return false;
+        }
     }
 
     private void initGameState(){
@@ -37,11 +59,11 @@ public class GameManager  {
     private void gameLoop(){
         while(gameState == GameState.RUNNING){
             Position placedPosition = null;
-            String command = null;
-            consoleRenderer.printMessage("Its your turn. Mr. " +  currentPiece.getLabel());
+            UserCommand command = null;
+            consoleRenderer.printMessage(MessageType.NEXT_TURN, currentPiece);
             char userInput = consoleInputHandler.getUserCommand(currentPiece.getLabel());
             command = interpretCommand(userInput);
-            if(!command.contains("DROP_")){
+            if(command != UserCommand.DROP){
                 executeSpecialCommand(command);
             }
             else{
@@ -63,22 +85,7 @@ public class GameManager  {
         }
     }
 
-    private void gameStateMessage(){
-        switch (gameState){
-            case WON:
-                consoleRenderer.printMessage("Game won by Mr. " + currentPiece.getLabel());
-                break;
 
-            case DRAW:
-                consoleRenderer.printMessage("lets call it a draw");
-                break;
-
-            case EXIT:
-                consoleRenderer.printMessage("Its sad, you decided to go, Mr. " + currentPiece.getLabel());
-                consoleRenderer.printMessage("How about meeting again");
-                break;
-        }
-    }
 
     private void switchPiece(){
         switch (currentPiece){
@@ -93,49 +100,46 @@ public class GameManager  {
         }
     }
 
-    private void executeSpecialCommand(String command){
+    private void executeSpecialCommand(UserCommand command){
         switch (command){
-            case "RESTART":
-                startGame();
-                break;
-            case "QUIT":
+            case RESTART->
+                gameState = GameState.RESTART;
+            case QUIT ->
                 gameState = GameState.EXIT;
-                break;
-            case "HELP":
+            case HELP->
                 consoleRenderer.printMenu();
-                break;
-            default:
-                consoleRenderer.printMessage("Game Manager sighs! Invalid command.");
-                consoleRenderer.printMessage("Press H for HELP");
+            default->
+                consoleRenderer.printMessage(MessageType.ERROR, null);
         }
     }
 
-    private Position dropInColumn(String command){
-        int chosenCol = Integer.parseInt(command.split("_")[1]); //validated beforehand
-        System.out.println("Chosen column: " + chosenCol + " by Player : " + currentPiece.getLabel());
+    private Position dropInColumn(UserCommand command){
+        int chosenCol = command.getValue(); //validated beforehand
+        consoleRenderer.logPlayerColumnChoice(currentPiece, chosenCol);
         Position placedPosition = board.placePiece(chosenCol, currentPiece);
         if(null == placedPosition){
-            consoleRenderer.printMessage("No room to place piece in column " + chosenCol);
-            consoleRenderer.printMessage("Make another choice.");
+            consoleRenderer.logColumnFullErr(chosenCol);
         }
 
         return placedPosition;
     }
 
-    private String interpretCommand(char command){
+    private UserCommand interpretCommand(char command){
         if(command == 'R'){
-            return "RESTART";
+            return UserCommand.RESTART;
         }
         else if(command == 'Q'){
-            return "QUIT";
+            return UserCommand.QUIT;
         }
         else if(command == 'H'){
-            return "HELP";
+            return UserCommand.HELP;
         }
         else if(command >= '0' && command <= '6'){
-            return "DROP_" + command;
+            UserCommand dropCommand = UserCommand.DROP;
+            dropCommand.setValue(command - '0');
+            return dropCommand;
         }else{
-            return "INVALID";
+            return UserCommand.INVALID;
         }
     }
 }

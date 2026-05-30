@@ -1,4 +1,4 @@
-package core.engine;
+package core.player;
 
 public enum UserCommand {
     RESTART(),
