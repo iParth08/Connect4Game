@@ -6,7 +6,7 @@ import utils.Position;
 public class Board {
     private final int row;
     private final int col;
-    private Cell [][] grid = null;
+    private final Cell [][] grid;
 
     public Board(int row, int col) {
         this.row = row;
@@ -62,7 +62,7 @@ public class Board {
         Piece [] yAxis = new Piece[7];
         Piece [] sameSignDiagonal = new Piece[7];
         Piece [] diffSignDiagonal = new Piece[7];
-        Piece currentPiece = null;
+        Piece currentPiece;
         int maxOffsetBound = 3;
 
         for(int offsetRow = -maxOffsetBound; offsetRow <= maxOffsetBound; offsetRow++){
@@ -116,7 +116,7 @@ public class Board {
 
     private boolean isConsecutiveConnect(Piece [] line, int offset){
         Piece targetPiece = line[offset];
-        Piece currentPiece = null;
+        Piece currentPiece;
         int matchCount = 1;
         int negSideCursor = offset-1;
         int posSideCursor = offset+1;

@@ -58,16 +58,14 @@ public class GameManager  {
 
     private void gameLoop(){
         while(gameState == GameState.RUNNING){
-            Position placedPosition = null;
-            UserCommand command = null;
             consoleRenderer.printMessage(MessageType.NEXT_TURN, currentPiece);
             char userInput = consoleInputHandler.getUserCommand(currentPiece.getLabel());
-            command = interpretCommand(userInput);
+            UserCommand command = interpretCommand(userInput);
             if(command != UserCommand.DROP){
                 executeSpecialCommand(command);
             }
             else{
-                placedPosition = dropInColumn(command);
+                Position placedPosition = dropInColumn(command);
                 if(placedPosition == null) continue;
 
                 consoleRenderer.printGameBoard(board);
